@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelApp TV</title>
+    
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://localhost:3000 http://192.168.100.11:3000 ws://localhost:3000 ws://192.168.100.11:3000 https://cdn.socket.io; script-src 'self' 'unsafe-inline' https://cdn.socket.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com; media-src 'self';">
+</head>
+<body>
+    <div id="app-background"></div>
+    
+    <main id="tv-container">
+        <header class="tv-header">
+            <div class="project-id">TravelApp TV - Kiosco Inteligente de Abordaje</div>
+            <div id="datetime-display" class="datetime">Cargando fecha...</div>
+        </header>
+        
+        <div class="content-wrapper">
+            <div id="grid-container">
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
