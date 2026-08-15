@@ -1,0 +1,12 @@
+# Ocultar dependencias y variables de entorno del backend
+node_modules/
+.env
+
+# Ocultar llaves de seguridad de Android/Flutter (Requisito Crítico)
+*.jks
+*.keystore
+key.properties
+
+# Ocultar archivos del sistema operativo
+.DS_Store
+Thumbs.db

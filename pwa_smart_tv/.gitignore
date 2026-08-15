@@ -1,0 +1,11 @@
+# Dependencias
+node_modules/
+
+# Archivos de entorno y seguridad
+.env
+.jks
+key.properties
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
