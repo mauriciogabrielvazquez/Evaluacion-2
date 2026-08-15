@@ -7,7 +7,7 @@ let currentPage = 0;
 const pageSize = 4;
 let currentIndex = 0;
 let cards = [];
-const FALLBACK_IMAGE = './default_trip.jpg';
+const FALLBACK_IMAGE = './default-trip.jpg';
 
 let tvSocket;
 let isModalOpen = false;
@@ -106,12 +106,35 @@ function updateDateTime() {
     if (display) display.textContent = now.toLocaleDateString('es-MX', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+// --- FUNCIÓN MODIFICADA PARA MODO OFFLINE ---
 async function loadTrips() {
     try {
         const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Error de red');
+        
         const trips = await response.json();
-        if (Array.isArray(trips)) { allTrips = trips; if (allTrips.length > 0) renderPage(0); }
-    } catch (error) {}
+        
+        // Guardar respaldo para cuando no haya internet
+        localStorage.setItem('tv_datos_offline', JSON.stringify(trips));
+        
+        if (Array.isArray(trips)) { 
+            allTrips = trips; 
+            if (allTrips.length > 0) renderPage(0); 
+        }
+    } catch (error) {
+        console.warn('Modo Offline: Cargando datos guardados...');
+        // Recuperar datos si falla el fetch
+        const datosGuardados = localStorage.getItem('tv_datos_offline');
+        if (datosGuardados) {
+            const trips = JSON.parse(datosGuardados);
+            if (Array.isArray(trips)) {
+                allTrips = trips;
+                if (allTrips.length > 0) renderPage(0);
+            }
+        } else {
+            console.error('No hay datos offline disponibles.');
+        }
+    }
 }
 
 function renderPage(pageIndex) {
@@ -126,7 +149,6 @@ function renderPage(pageIndex) {
         card.className = 'card';
         card.tabIndex = 0;
         
-        // Uso de la función de imagen por defecto
         const validImageUrl = obtenerImagenViaje(trip);
 
         card.innerHTML = `
@@ -166,7 +188,7 @@ document.addEventListener('keydown', (e) => {
 
     if (isModalOpen) {
         if (e.key === 'Enter') {
-            ignoreTelemetry = true; // Bloquea los datos residuales para evitar que se reabra solo
+            ignoreTelemetry = true; 
             const tvUserId = localStorage.getItem('tv_userId'); 
             if (tvSocket && tvUserId) tvSocket.emit('close_trip_modal', { userId: tvUserId });
             
@@ -199,7 +221,7 @@ document.addEventListener('keydown', (e) => {
 
             const tvUserId = localStorage.getItem('tv_userId'); 
             if (currentTrip && tvUserId) {
-                ignoreTelemetry = false; // Permite recibir datos de nuevo
+                ignoreTelemetry = false; 
                 fetch(TV_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -215,4 +237,23 @@ document.addEventListener('keydown', (e) => {
 
 setInterval(updateDateTime, 1000);
 updateDateTime();
-mostrarLoginTV();
+
+const savedUserId = localStorage.getItem('tv_userId');
+if (savedUserId) {
+    iniciarSocketTV(savedUserId);
+    loadTrips();
+} else {
+    mostrarLoginTV();
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registrado con éxito con el scope:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Error al registrar el ServiceWorker:', error);
+      });
+  });
+}

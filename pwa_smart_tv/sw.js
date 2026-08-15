@@ -1,6 +1,5 @@
 const CACHE_NAME = 'travel-tv-v1';
 const STATIC_ASSETS = [
-  './',
   './index.html',
   './styles.css',
   './app.js',
